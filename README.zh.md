@@ -82,8 +82,8 @@ npx quartz build --serve
 1. **打 tag（当前流程）**：改 `package.json` 的 `version` → `npm run build` → 提交 →
    `git tag vX.Y.Z && git push origin vX.Y.Z`。站点可用
    `npx quartz plugin add github:FDscend/quartz_highlight_colors#vX.Y.Z` 固定版本。
-2. **npm（可选）**：`npx changeset` → 提交 → 合并；`release.yml` 会自动开版本 PR 并用
-   `NPM_TOKEN` 发布。只有在决定同时走 npm 分发时才需要。
+2. **npm（可选）**：模板自带的 changesets 自动发布 workflow 已移除（本插件只走 git 源分发）。
+   将来若需发 npm，可从仓库历史恢复 `release.yml`、配置 `NPM_TOKEN`，再 `npx changeset` → 提交 → 合并。
 
 ## 许可证
 

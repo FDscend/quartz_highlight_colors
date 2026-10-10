@@ -7,7 +7,7 @@
 ## 已完成
 
 - 仓库基于官方模板 [quartz-community/plugin-template](https://github.com/quartz-community/plugin-template)
-  建立（tsup 打包 + vitest + eslint/prettier + CI + changesets 发布流程），模板示例代码已清理。
+  建立（tsup 打包 + vitest + eslint/prettier + CI），模板示例代码已清理。
 - 实现：
   - `src/colors.ts`：六色调色板、`applyHighlightColors()`（span → mark 正则改写）、`buildHighlightCss()`
   - `src/highlight-colors.ts`：`HighlightColors` 插件（remark 阶段改写 + `externalResources` 注入 CSS）
@@ -19,6 +19,10 @@
   - `npm run build`：`dist/` 已生成并做过冒烟测试，`dist/index.js` 的外部 import 只有
     `module`（Node 内建），符合 CI 的 externals 校验
 - 文档：`README.md`（英文）、`README.zh.md`（中文）、`AGENTS.md`（开发约定）。
+- 已移除模板自带的 `.github/workflows/release.yml`（changesets 自动发 npm）：它在每次 push main
+  时会执行 `changeset publish`，因未配置 `NPM_TOKEN` 而失败（Run 注解为 "Publish command exited
+  with code 1"，不影响 CI 与插件分发）。本插件只走 git 源，无需该 workflow；恢复方式：
+  `git show 1665d9f:.github/workflows/release.yml > .github/workflows/release.yml`。
 
 ## 联调记录（2026-10-11，已完成）
 
@@ -60,7 +64,8 @@ npx quartz build --serve                                              # http://l
 
 - [ ] 确认 npm 包名 / scope（原计划 `@obsidian-tutorial/quartz-highlight-colors`，也可用个人 scope），
       同步修改 `package.json` 的 `name` 与两个 README 的示例。
-- [ ] `npm publish --access public`，或配 `NPM_TOKEN` 让 `release.yml` 自动发布。
+- [ ] `npm publish --access public`（手动），或从仓库历史恢复模板的 `release.yml` 并配
+      `NPM_TOKEN` 自动发布。
 
 - [x] `package.json` 的 `repository` / `homepage` 已填（指向上述 GitHub 仓库）。
 - [x] GitHub 仓库已关联（`origin`）。
@@ -77,7 +82,8 @@ npx quartz build --serve                                              # http://l
 站点侧固定版本：`npx quartz plugin add github:FDscend/quartz_highlight_colors#v0.1.0`；
 不写 `#ref` 则跟随默认分支（升级用 `npx quartz plugin install --latest`）。
 
-（可选）将来若发 npm，则改用 changesets `release.yml` 流程或手动 `npm publish --access public`。
+（可选）将来若发 npm：手动 `npm publish --access public`，或从仓库历史恢复 changesets 的
+`release.yml`。
 
 ## 待办 3：主站接线（obsidian_tutorial）
 

@@ -85,8 +85,9 @@ Local sources are symlinked, so edits here are picked up immediately (run `npm r
 1. **Git tag (current flow)** — bump `version` in `package.json`, run `npm run build`, commit,
    then `git tag vX.Y.Z && git push origin vX.Y.Z`. Sites can pin it with
    `npx quartz plugin add github:FDscend/quartz_highlight_colors#vX.Y.Z`.
-2. **npm (optional)** — run `npx changeset`, commit, merge; the `release.yml` workflow opens a
-   version PR and publishes with `NPM_TOKEN`. Only needed if you decide to distribute via npm too.
+2. **npm (optional)** — the template's changesets workflow was removed because this plugin is
+   distributed via git only. If you ever publish to npm, restore `release.yml` from the repository
+   history, set `NPM_TOKEN`, then run `npx changeset`, commit and merge.
 
 Keep the `quartz.version` field in `package.json` in sync for manifest consumers.
 
