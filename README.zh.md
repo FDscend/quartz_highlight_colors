@@ -1,5 +1,8 @@
 # Quartz Highlight Colors
 
+| [English](README.md) | [中文](README.zh.md) |
+| -------------------- | -------------------- |
+
 [Quartz](https://quartz.jzhao.xyz/) v5 插件：把 Obsidian 的彩色高亮 `==🔴重要==` 渲染成真正的彩色高亮，
 颜色表情作为颜色标记被隐藏。
 
@@ -31,14 +34,14 @@
 Git 源（无需发布到 npm）：
 
 ```shell
-npx quartz plugin add github:OWNER/quartz-highlight-colors
+npx quartz plugin add github:FDscend/quartz_highlight_colors
 ```
 
 或在 `quartz.config.yaml` 中：
 
 ```yaml
 plugins:
-  - source: github:OWNER/quartz-highlight-colors
+  - source: github:FDscend/quartz_highlight_colors
     enabled: true
     order: 36
 ```

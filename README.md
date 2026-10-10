@@ -1,22 +1,25 @@
 # Quartz Highlight Colors
 
-A [Quartz](https://quartz.jzhao.xyz/) v5 transformer plugin that renders Obsidian's coloured
-highlights — `==🔴重要==` — as real coloured highlights, hiding the colour emoji.
+| [English](README.md) | [中文](README.zh.md) |
+| -------------------- | -------------------- |
 
-| Color  | Markdown         | Rendered                                                        |
-| ------ | ---------------- | --------------------------------------------------------------- |
-| Red    | `==🔴重要==`     | `<mark class="text-highlight" data-highlight="red">重要</mark>` |
-| Orange | `==🟠跟进==`     | `<mark … data-highlight="orange">跟进</mark>`                   |
-| Yellow | `==🟡记住这个==` | `<mark … data-highlight="yellow">记住这个</mark>`               |
-| Green  | `==🟢已完成==`   | `<mark … data-highlight="green">已完成</mark>`                  |
-| Blue   | `==🔵参考==`     | `<mark … data-highlight="blue">参考</mark>`                     |
-| Purple | `==🟣想法==`     | `<mark … data-highlight="purple">想法</mark>`                   |
+A [Quartz](https://quartz.jzhao.xyz/) v5 transformer plugin that renders Obsidian's coloured
+highlights — `==🔴Important==` — as real coloured highlights, hiding the colour emoji.
+
+| Color  | Markdown              | Rendered                                                             |
+| ------ | --------------------- | -------------------------------------------------------------------- |
+| Red    | `==🔴Important==`     | `<mark class="text-highlight" data-highlight="red">Important</mark>` |
+| Orange | `==🟠Follow up==`     | `<mark … data-highlight="orange">Follow up</mark>`                   |
+| Yellow | `==🟡Remember this==` | `<mark … data-highlight="yellow">Remember this</mark>`               |
+| Green  | `==🟢Done==`          | `<mark … data-highlight="green">Done</mark>`                         |
+| Blue   | `==🔵Reference==`     | `<mark … data-highlight="blue">Reference</mark>`                     |
+| Purple | `==🟣Idea==`          | `<mark … data-highlight="purple">Idea</mark>`                        |
 
 Rules (same as Obsidian and the
 [VS Code markdown-highlight-mark extension](https://github.com/FDscend/vscode_markdown_highlight)):
 
 - The colour emoji must come **immediately after the opening `==`** and must be followed by content.
-  `==🔴==` and `==重要🔴==` are plain highlights with the emoji kept as text.
+  `==🔴==` and `==Important🔴==` are plain highlights with the emoji kept as text.
 - Highlights without a colour emoji keep the site's default highlight styling.
 - Only `data-highlight` is added — border radius, padding etc. still come from your theme.
 
@@ -32,14 +35,14 @@ small stylesheet with one rule per colour.
 Git source (works today, no npm release needed):
 
 ```shell
-npx quartz plugin add github:OWNER/quartz-highlight-colors
+npx quartz plugin add github:FDscend/quartz_highlight_colors
 ```
 
 Or in `quartz.config.yaml`:
 
 ```yaml
 plugins:
-  - source: github:OWNER/quartz-highlight-colors
+  - source: github:FDscend/quartz_highlight_colors
     enabled: true
     order: 36
 ```

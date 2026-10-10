@@ -4,6 +4,11 @@
   "description": "Quartz v5 plugin that renders Obsidian colored highlights (==🔴text==) as colored highlights.",
   "type": "module",
   "license": "MIT",
+  "homepage": "https://github.com/FDscend/quartz_highlight_colors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FDscend/quartz_highlight_colors.git"
+  },
   "keywords": [
     "quartz",
     "quartz-plugin",
