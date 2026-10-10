@@ -42,7 +42,7 @@ npx quartz build --serve                                              # http://l
 - [x] 行内代码里的 `` `==🔴重要==` `` 保持不变色
 - [x] 表格单元格内的高亮正常渲染
 - [x] 六色成功盖过宿主主题的统一底色（`article :is(mark, .text-highlight)`）
-- [ ] 暗色模式未单独验证（颜色是 30% 半透明混合，预计表现一致）
+- [x] 深色模式已验证可读（30% 半透明混合在深色底上表现正常）
 
 注意：
 
@@ -67,11 +67,12 @@ npx quartz build --serve                                              # http://l
 
 ## 待办 2：发版（git 源）
 
-改完代码后：`npm run build` → 提交 `dist/` → 打 tag：
+改完代码后：`npm run build` → 提交 `dist/` → 打 tag。两种等价做法：
 
-```shell
-git tag v0.1.0 && git push origin v0.1.0
-```
+- 命令行：`git tag -a v0.1.0 -m "v0.1.0" && git push origin v0.1.0`
+- GitHub UI：Releases → Draft a new release → 在「Choose a tag」里**直接输入一个新 tag 名**
+  （如 `v0.1.0`），选择 "Create new tag on publish"，目标选 `main`，填 release notes 后 Publish；
+  GitHub 会自动创建该 tag，无需先在命令行建 tag。
 
 站点侧固定版本：`npx quartz plugin add github:FDscend/quartz_highlight_colors#v0.1.0`；
 不写 `#ref` 则跟随默认分支（升级用 `npx quartz plugin install --latest`）。
