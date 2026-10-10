@@ -46,14 +46,9 @@ plugins:
     order: 36
 ```
 
-npm（发布之后）：
-
-```yaml
-plugins:
-  - source: "@obsidian-tutorial/quartz-highlight-colors"
-    enabled: true
-    order: 36
-```
+> [!note]
+> 插件目前只通过 GitHub 分发（尚未发布 npm）。将来若发到 npm，写法同样是
+> `source: "@你的scope/quartz-highlight-colors"`。
 
 > [!important]
 > 插件必须运行在 Obsidian Flavored Markdown（`order: 30`）**之后**。清单里已声明
@@ -82,12 +77,13 @@ npx quartz build --serve
 
 ## 发布
 
-`dist/` 已提交，必须与 `src/` 保持同步。两种方式：
+`dist/` 已提交，必须与 `src/` 保持同步。以 tag 发版：
 
-1. **Changesets 流程（模板默认）**：`npx changeset` → 提交 → 合并；`release.yml` 会自动开版本 PR
-   并用 `NPM_TOKEN` 发布。
-2. **手动**：改 `package.json` 的 `version` → `npm publish --access public` →
-   `git tag vX.Y.Z && git push origin vX.Y.Z`。
+1. **打 tag（当前流程）**：改 `package.json` 的 `version` → `npm run build` → 提交 →
+   `git tag vX.Y.Z && git push origin vX.Y.Z`。站点可用
+   `npx quartz plugin add github:FDscend/quartz_highlight_colors#vX.Y.Z` 固定版本。
+2. **npm（可选）**：`npx changeset` → 提交 → 合并；`release.yml` 会自动开版本 PR 并用
+   `NPM_TOKEN` 发布。只有在决定同时走 npm 分发时才需要。
 
 ## 许可证
 

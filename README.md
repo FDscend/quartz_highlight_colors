@@ -47,14 +47,10 @@ plugins:
     order: 36
 ```
 
-npm (after publishing):
-
-```yaml
-plugins:
-  - source: "@obsidian-tutorial/quartz-highlight-colors"
-    enabled: true
-    order: 36
-```
+> [!note]
+> The plugin is currently distributed through GitHub only — there is no npm release yet. If you
+> publish it to npm later, register it as `source: "@your-scope/quartz-highlight-colors"` in the
+> same way.
 
 > [!important]
 > The plugin must run **after** Obsidian Flavored Markdown (`order: 30`). Its manifest declares
@@ -84,12 +80,13 @@ Local sources are symlinked, so edits here are picked up immediately (run `npm r
 
 ## Releasing
 
-`dist/` is committed and must stay in sync with `src/`. Two options:
+`dist/` is committed and must stay in sync with `src/`. Git tags are the release:
 
-1. **Changesets workflow (template default)** — run `npx changeset`, commit, merge; the
-   `release.yml` workflow opens a version PR and publishes with `NPM_TOKEN`.
-2. **Manual** — bump `version` in `package.json`, `npm publish --access public`, then tag
-   `git tag vX.Y.Z && git push origin vX.Y.Z`.
+1. **Git tag (current flow)** — bump `version` in `package.json`, run `npm run build`, commit,
+   then `git tag vX.Y.Z && git push origin vX.Y.Z`. Sites can pin it with
+   `npx quartz plugin add github:FDscend/quartz_highlight_colors#vX.Y.Z`.
+2. **npm (optional)** — run `npx changeset`, commit, merge; the `release.yml` workflow opens a
+   version PR and publishes with `NPM_TOKEN`. Only needed if you decide to distribute via npm too.
 
 Keep the `quartz.version` field in `package.json` in sync for manifest consumers.
 
