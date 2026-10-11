@@ -39,3 +39,7 @@ coverage/
 # Cache
 .cache/
 .eslintcache
+
+# 内部文档：仅保留在本地，不随仓库发布
+AGENTS.md
+HANDOFF.md
