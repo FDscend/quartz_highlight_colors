@@ -188,7 +188,11 @@ function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
   let reverse;
   let test;
   let visitor;
-  {
+  if (typeof testOrVisitor === "function" && typeof visitorOrReverse !== "function") {
+    test = void 0;
+    visitor = testOrVisitor;
+    reverse = visitorOrReverse;
+  } else {
     test = testOrVisitor;
     visitor = visitorOrReverse;
     reverse = maybeReverse;
@@ -268,8 +272,134 @@ function buildHighlightCss() {
   ).join("\n\n");
 }
 
+// src/highlight-syntax.ts
+var MARKER = "==";
+var HIGHLIGHT_CLASS = "text-highlight";
+function isText(node) {
+  return node?.type === "text";
+}
+function isEmpty(nodes) {
+  return nodes.every((node) => node.type === "text" && node.value.length === 0);
+}
+function finalize(inner, endIndex, endOffset) {
+  if (isEmpty(inner)) {
+    return void 0;
+  }
+  const [first] = inner;
+  if (first?.type === "text" && first.value.startsWith("=")) {
+    return void 0;
+  }
+  if (first?.type === "text") {
+    const marker = readColorMarker(first.value);
+    if (marker) {
+      const rest = first.value.slice(marker.length);
+      const stripped = rest.length ? [{ type: "text", value: rest }, ...inner.slice(1)] : inner.slice(1);
+      if (!isEmpty(stripped)) {
+        return { endIndex, endOffset, inner: stripped, color: marker.color };
+      }
+    }
+  }
+  return { endIndex, endOffset, inner };
+}
+function matchHighlight(children, startIndex, openOffset) {
+  const head = children[startIndex].value.slice(openOffset + MARKER.length);
+  if (head.includes("\n")) {
+    return void 0;
+  }
+  const closeInHead = head.indexOf(MARKER);
+  if (closeInHead !== -1) {
+    const inner2 = closeInHead > 0 ? [{ type: "text", value: head.slice(0, closeInHead) }] : [];
+    return finalize(inner2, startIndex, openOffset + MARKER.length + closeInHead);
+  }
+  const inner = [];
+  if (head.length) {
+    inner.push({ type: "text", value: head });
+  }
+  for (let index = startIndex + 1; index < children.length; index += 1) {
+    const node = children[index];
+    if (isText(node)) {
+      if (node.value.includes("\n")) {
+        return void 0;
+      }
+      const close = node.value.indexOf(MARKER);
+      if (close === -1) {
+        if (node.value.length) {
+          inner.push({ type: "text", value: node.value });
+        }
+        continue;
+      }
+      if (close > 0) {
+        inner.push({ type: "text", value: node.value.slice(0, close) });
+      }
+      return finalize(inner, index, close);
+    }
+    inner.push(node);
+  }
+  return void 0;
+}
+function createHighlightNode(inner, color2) {
+  const hProperties = { className: [HIGHLIGHT_CLASS] };
+  if (color2) {
+    hProperties["data-highlight"] = color2;
+  }
+  const node = {
+    type: "highlightColor",
+    data: { hName: color2 ? "mark" : "span", hProperties },
+    children: inner
+  };
+  return node;
+}
+function wrapHighlights(children) {
+  let index = 0;
+  let from = 0;
+  while (index < children.length) {
+    const node = children[index];
+    if (!isText(node)) {
+      index += 1;
+      from = 0;
+      continue;
+    }
+    const open = node.value.indexOf(MARKER, from);
+    if (open === -1) {
+      index += 1;
+      from = 0;
+      continue;
+    }
+    const match = matchHighlight(children, index, open);
+    if (!match) {
+      from = open + 1;
+      continue;
+    }
+    const prefix = node.value.slice(0, open);
+    const tail = children[match.endIndex].value.slice(match.endOffset + MARKER.length);
+    const replacement = [];
+    if (prefix.length) {
+      replacement.push({ type: "text", value: prefix });
+    }
+    replacement.push(createHighlightNode(match.inner, match.color));
+    if (tail.length) {
+      replacement.push({ type: "text", value: tail });
+    }
+    children.splice(index, match.endIndex - index + 1, ...replacement);
+    index += replacement.length - (tail.length ? 1 : 0);
+    from = 0;
+  }
+}
+function transformHighlightSyntax(tree) {
+  const parents = [];
+  visit(tree, (node) => {
+    if ("children" in node) {
+      parents.push(node);
+    }
+  });
+  for (const parent of parents) {
+    wrapHighlights(parent.children);
+  }
+}
+
 // src/highlight-colors.ts
 var remarkHighlightColors = () => (tree) => {
+  transformHighlightSyntax(tree);
   visit(tree, "html", (node) => {
     node.value = applyHighlightColors(node.value);
   });
@@ -288,6 +418,6 @@ var HighlightColors = () => {
   };
 };
 
-export { HighlightColors, applyHighlightColors, buildHighlightCss, colorPalette, remarkHighlightColors };
+export { HighlightColors, applyHighlightColors, buildHighlightCss, colorPalette, remarkHighlightColors, transformHighlightSyntax };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

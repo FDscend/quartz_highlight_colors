@@ -4,7 +4,8 @@
  * Obsidian v1.14 起支持在起始 `==` 后紧跟颜色表情来指定高亮颜色（例如 `==🔴重要==`），
  * 表情本身只作颜色标记、不显示。Quartz 的 Obsidian Flavored Markdown 插件会先把
  * `==…==` 转成 `<span class="text-highlight">…</span>`，本模块负责把它改写成
- * `<mark class="text-highlight" data-highlight="red">…</mark>`。
+ * `<mark class="text-highlight" data-highlight="red">…</mark>`；
+ * 关闭 OFM 高亮解析时改由 `highlight-syntax.ts` 在 mdast 层接管，颜色规则一致。
  */
 
 /** 颜色标记表情 → 颜色名与背景色（顺序即文档展示顺序） */
@@ -48,7 +49,7 @@ const VARIATION_SELECTOR = "\uFE0F";
 const HIGHLIGHT_SPAN = /<span class="text-highlight">([\s\S]*?)<\/span>/g;
 
 /** 读出内容开头的颜色标记，返回颜色与实际标记长度（不含则为 undefined） */
-function readColorMarker(text: string): { color: string; length: number } | undefined {
+export function readColorMarker(text: string): { color: string; length: number } | undefined {
   for (const { emoji, color } of colorPalette) {
     if (text.startsWith(emoji + VARIATION_SELECTOR)) {
       return { color, length: emoji.length + VARIATION_SELECTOR.length };

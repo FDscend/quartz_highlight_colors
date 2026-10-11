@@ -29,6 +29,10 @@
 `<span class="text-highlight">文字</span>`；本插件在 OFM **之后**运行，把它改写成
 `<mark class="text-highlight" data-highlight="…">`（剥离颜色表情），并注入一份按颜色区分的样式。
 
+若站点关闭了 OFM 的高亮解析（`highlight: false`），`==文字==` 会以普通文本进入 mdast，
+本插件会在 mdast 层接管并生成同样的 `<mark>` / `<span>`，此时高亮内容里的 Markdown 会被正常解析
+（见下文"嵌套 Markdown"）。两种形态可以共存，同一份站点先改配置再装插件都不会出问题。
+
 ## 安装
 
 Git 源（无需发布到 npm）：
@@ -54,7 +58,38 @@ plugins:
 > 插件必须运行在 Obsidian Flavored Markdown（`order: 30`）**之后**。清单里已声明
 > `defaultOrder: 36`，只要保证配置中它排在 OFM 后面即可。
 
-前置条件：Quartz v5 站点已启用 `@quartz-community/obsidian-flavored-markdown`（`highlight` 默认开启）。
+前置条件：Quartz v5 站点已启用 `@quartz-community/obsidian-flavored-markdown`（默认
+`highlight: true`；若改为 `false` 由本插件接管，见下文）。
+
+## 嵌套 Markdown（可选）
+
+OFM 默认把高亮内容当**纯文本**处理：`==🔴**粗体**==` 只会显示字面的星号。若希望高亮内能用
+加粗、斜体、行内代码、链接等写法，把 OFM 的高亮解析关掉，交给本插件接管：
+
+```yaml
+plugins:
+  - source: "@quartz-community/obsidian-flavored-markdown"
+    enabled: true
+    options:
+      highlight: false # 由 highlight-colors 接管 ==…==
+    order: 30
+  - source: github:FDscend/quartz_highlight_colors
+    enabled: true
+    order: 36
+```
+
+接管模式的颜色规则与默认模式完全一致，额外支持嵌套：
+
+| Markdown                      | 渲染结果                                                 |
+| ----------------------------- | -------------------------------------------------------- |
+| `==🔴**重要**==`              | `<mark …><strong>重要</strong></mark>`                   |
+| `==🔵*参考*==`                | `<mark …><em>参考</em></mark>`                           |
+| `==🟡[链接](https://q.dev)==` | `<mark …><a href="https://q.dev">链接</a></mark>`        |
+| `==**普通高亮**==`            | `<span class="text-highlight"><strong>…</strong></span>` |
+
+> [!warning]
+> `highlight: false` 与启用本插件要**成对配置**：只关掉 OFM 而不启用本插件，页面上的
+> `==…==` 会原样显示成字面文本。
 
 ## 开发
 

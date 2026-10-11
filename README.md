@@ -30,6 +30,12 @@ Rules (same as Obsidian and the
 into `<mark class="text-highlight" data-highlight="…">`, dropping the colour emoji, and injects a
 small stylesheet with one rule per colour.
 
+When the site turns OFM's highlight parsing off (`highlight: false`), `==text==` reaches the mdast
+as plain text instead. The plugin then takes over at the mdast level, producing the same
+`<mark>` / `<span>` output, and Markdown inside the highlight is parsed normally (see
+"Nested Markdown" below). Both shapes can coexist, so switching the option before or after
+installing the plugin is safe.
+
 ## Installation
 
 Git source (works today, no npm release needed):
@@ -57,7 +63,38 @@ plugins:
 > `defaultOrder: 36`, so just keep the entry after OFM in the plugin list.
 
 Requirements: a Quartz v5 site with `@quartz-community/obsidian-flavored-markdown` enabled
-(default `highlight: true`).
+(default `highlight: true`; set it to `false` to let this plugin take over — see below).
+
+## Nested Markdown (optional)
+
+OFM treats highlight content as **plain text**: `==🔴**bold**==` renders literal asterisks. To get
+emphasis, inline code and links inside highlights, turn OFM's highlight parsing off and let this
+plugin take over:
+
+```yaml
+plugins:
+  - source: "@quartz-community/obsidian-flavored-markdown"
+    enabled: true
+    options:
+      highlight: false # handled by highlight-colors
+    order: 30
+  - source: github:FDscend/quartz_highlight_colors
+    enabled: true
+    order: 36
+```
+
+Colour rules are identical to the default mode; nesting is the only difference:
+
+| Markdown                      | Rendered                                                 |
+| ----------------------------- | -------------------------------------------------------- |
+| `==🔴**Important**==`         | `<mark …><strong>Important</strong></mark>`              |
+| `==🔵*Reference*==`           | `<mark …><em>Reference</em></mark>`                      |
+| `==🟡[link](https://q.dev)==` | `<mark …><a href="https://q.dev">link</a></mark>`        |
+| `==**plain highlight**==`     | `<span class="text-highlight"><strong>…</strong></span>` |
+
+> [!warning]
+> `highlight: false` and this plugin must be configured **together**: turning OFM's parsing off
+> without enabling the plugin leaves `==…==` as literal text on your pages.
 
 ## Development
 

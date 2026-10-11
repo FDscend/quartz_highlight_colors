@@ -7,13 +7,21 @@ export { BuildCtx, CSSResource, JSResource, ProcessedContent, QuartzPluginData, 
  * remark 插件：把 Obsidian Flavored Markdown 生成的高亮 span 改写为带
  * `data-highlight` 的 mark。此时 `==…==` 已经变成原始 HTML 节点，
  * 行内代码与代码块不会经过这里，因此不会被误伤。
+ *
+ * 若宿主关闭了 OFM 的高亮解析（`highlight: false`），`==…==` 会以普通文本进入
+ * mdast，此时由 `transformHighlightSyntax` 接管，`==🔴**粗体**==` 等嵌套写法会正常解析。
  */
 declare const remarkHighlightColors: Plugin<[], Root>;
 /**
  * 渲染 Obsidian 彩色高亮（`==🔴重要==`）的 Quartz 插件。
  *
- * 依赖宿主站点启用 `@quartz-community/obsidian-flavored-markdown` 的高亮解析
- * （`highlight` 选项默认开启），且本插件需配置在其之后运行（见 `defaultOrder`）。
+ * 两种工作模式：
+ * - 宿主保留 OFM 的高亮解析（`highlight` 默认开启）：改写 OFM 产出的高亮 span，
+ *   高亮内容按纯文本渲染（上游行为）。
+ * - 宿主关闭 OFM 的高亮解析（`highlight: false`）：插件在 mdast 层接管 `==…==`，
+ *   支持 `==🔴**粗体**==` 这类嵌套写法。
+ *
+ * 两种模式下都需配置在 Obsidian Flavored Markdown 之后运行（见 `defaultOrder`）。
  */
 declare const HighlightColors: QuartzTransformerPlugin;
 
@@ -23,7 +31,8 @@ declare const HighlightColors: QuartzTransformerPlugin;
  * Obsidian v1.14 起支持在起始 `==` 后紧跟颜色表情来指定高亮颜色（例如 `==🔴重要==`），
  * 表情本身只作颜色标记、不显示。Quartz 的 Obsidian Flavored Markdown 插件会先把
  * `==…==` 转成 `<span class="text-highlight">…</span>`，本模块负责把它改写成
- * `<mark class="text-highlight" data-highlight="red">…</mark>`。
+ * `<mark class="text-highlight" data-highlight="red">…</mark>`；
+ * 关闭 OFM 高亮解析时改由 `highlight-syntax.ts` 在 mdast 层接管，颜色规则一致。
  */
 /** 颜色标记表情 → 颜色名与背景色（顺序即文档展示顺序） */
 declare const colorPalette: readonly [{
@@ -67,4 +76,23 @@ declare function applyHighlightColors(html: string): string;
  */
 declare function buildHighlightCss(): string;
 
-export { HighlightColors, applyHighlightColors, buildHighlightCss, colorPalette, remarkHighlightColors };
+/**
+ * mdast 层的高亮语法接管。
+ *
+ * 宿主站点关闭 Obsidian Flavored Markdown 的高亮解析（`highlight: false`）后，
+ * `==…==` 会以普通文本形态进入 mdast，本模块负责把它们重新组装成
+ * `<mark class="text-highlight" data-highlight="…">` / `<span class="text-highlight">`。
+ *
+ * 与 OFM "把高亮内容当纯文本" 的做法不同，这里把 `==…==` 之间的节点整体收进来，
+ * 因此 `==🔴**粗体**==` 这类嵌套写法能正常解析。
+ */
+
+/**
+ * 遍历整棵树，把 `==…==` 重组为高亮节点。
+ *
+ * 只在 text 节点上匹配，因此行内代码与代码块里的 `==…==` 不会被误伤；
+ * 各层级的 children 都会被处理（段落、标题、表格单元格、列表等）。
+ */
+declare function transformHighlightSyntax(tree: Root): void;
+
+export { HighlightColors, applyHighlightColors, buildHighlightCss, colorPalette, remarkHighlightColors, transformHighlightSyntax };
