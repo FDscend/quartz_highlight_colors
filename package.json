@@ -1,6 +1,6 @@
 {
   "name": "@obsidian-tutorial/quartz-highlight-colors",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Quartz v5 plugin that renders Obsidian colored highlights (==🔴text==) as colored highlights.",
   "type": "module",
   "license": "MIT",
